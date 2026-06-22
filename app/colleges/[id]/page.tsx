@@ -1,6 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
+type Course = {
+  id: string;
+  name: string;
+  duration: string;
+  fees: number;
+};
+
+type Review = {
+  id: string;
+  rating: number;
+  comment: string;
+  author: string;
+  createdAt: Date;
+};
+
 export default async function CollegeDetail({
   params,
 }: {
@@ -59,15 +74,10 @@ export default async function CollegeDetail({
           <p className="text-gray-400">No courses listed yet.</p>
         ) : (
           <ul className="space-y-2">
-            {college.courses.map((c: { id: string; name: string; duration: string; fees: number }) => (
-              <li
-                key={c.id}
-                className="border rounded-lg p-3 flex justify-between"
-              >
+            {college.courses.map((c: Course) => (
+              <li key={c.id} className="border rounded-lg p-3 flex justify-between">
                 <span>{c.name} · {c.duration}</span>
-                <span className="font-medium">
-                  ₹{c.fees.toLocaleString("en-IN")}
-                </span>
+                <span className="font-medium">₹{c.fees.toLocaleString("en-IN")}</span>
               </li>
             ))}
           </ul>
@@ -80,7 +90,7 @@ export default async function CollegeDetail({
           <p className="text-gray-400">No reviews yet.</p>
         ) : (
           <div className="space-y-3">
-            {college.reviews.map((r) => (
+            {college.reviews.map((r: Review) => (
               <div key={r.id} className="border rounded-lg p-3">
                 <div className="flex justify-between mb-1">
                   <span className="font-medium">{r.author}</span>
