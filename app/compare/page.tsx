@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
 type College = {
@@ -15,7 +15,21 @@ type College = {
   placementHighest: number | null;
 };
 
-export default function ComparePage() {
+function formatMoney(n: number | null) {
+  if (n === null) return "N/A";
+  return "₹" + n.toLocaleString("en-IN");
+}
+
+const rows = [
+  { label: "Location", get: (c: College) => c.city + ", " + c.state },
+  { label: "Fees (per year)", get: (c: College) => formatMoney(c.fees) },
+  { label: "Rating", get: (c: College) => "★ " + c.rating },
+  { label: "Type", get: (c: College) => c.type },
+  { label: "Avg Placement", get: (c: College) => formatMoney(c.placementAvg) },
+  { label: "Highest Placement", get: (c: College) => formatMoney(c.placementHighest) },
+];
+
+function CompareContent() {
   const searchParams = useSearchParams();
   const ids = searchParams.get("ids") || "";
   const [colleges, setColleges] = useState<College[]>([]);
@@ -37,24 +51,9 @@ export default function ComparePage() {
     );
   }
 
-  function formatMoney(n: number | null) {
-    if (n === null) return "N/A";
-    return "₹" + n.toLocaleString("en-IN");
-  }
-
-  const rows = [
-    { label: "Location", get: (c: College) => c.city + ", " + c.state },
-    { label: "Fees (per year)", get: (c: College) => formatMoney(c.fees) },
-    { label: "Rating", get: (c: College) => "★ " + c.rating },
-    { label: "Type", get: (c: College) => c.type },
-    { label: "Avg Placement", get: (c: College) => formatMoney(c.placementAvg) },
-    { label: "Highest Placement", get: (c: College) => formatMoney(c.placementHighest) },
-  ];
-
   return (
     <main className="max-w-5xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold mb-6 text-gray-900">Compare Colleges</h1>
-
       {colleges.length === 0 ? (
         <p className="text-gray-400">Loading...</p>
       ) : (
@@ -86,5 +85,13 @@ export default function ComparePage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function ComparePage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-gray-400">Loading...</div>}>
+      <CompareContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Star, Search, TrendingUp } from "lucide-react";
@@ -19,7 +19,7 @@ interface College {
   overview: string;
 }
 
-export default function CollegesPage() {
+function CollegesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [colleges, setColleges] = useState<College[]>([]);
@@ -57,7 +57,6 @@ export default function CollegesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link href="/" className="text-xl font-bold text-indigo-600 shrink-0">
@@ -73,10 +72,7 @@ export default function CollegesPage() {
               className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-          <Link
-            href="/auth"
-            className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 shrink-0"
-          >
+          <Link href="/auth" className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 shrink-0">
             Login
           </Link>
         </div>
@@ -93,7 +89,6 @@ export default function CollegesPage() {
           </p>
         </div>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading
             ? Array.from({ length: 6 }).map((_, i) => (
@@ -106,9 +101,7 @@ export default function CollegesPage() {
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-2">
-                    {[1, 2, 3].map((j) => (
-                      <div key={j} className="h-12 bg-gray-100 rounded-xl" />
-                    ))}
+                    {[1, 2, 3].map((j) => <div key={j} className="h-12 bg-gray-100 rounded-xl" />)}
                   </div>
                 </div>
               ))
@@ -159,9 +152,7 @@ export default function CollegesPage() {
                         <div className="flex items-center justify-center gap-0.5">
                           <TrendingUp size={11} className="text-green-500" />
                           <span className="text-sm font-bold text-gray-900">
-                            {college.placementAvg
-                              ? `₹${(college.placementAvg / 100000).toFixed(1)}L`
-                              : "—"}
+                            {college.placementAvg ? `₹${(college.placementAvg / 100000).toFixed(1)}L` : "—"}
                           </span>
                         </div>
                         <p className="text-[10px] text-gray-400 mt-0.5">Avg Pkg</p>
@@ -172,7 +163,6 @@ export default function CollegesPage() {
               ))}
         </div>
 
-        {/* Empty state */}
         {!loading && colleges.length === 0 && (
           <div className="text-center py-20">
             <div className="text-5xl mb-4">🎓</div>
@@ -181,30 +171,29 @@ export default function CollegesPage() {
           </div>
         )}
 
-        {/* Pagination */}
         {!loading && total > 12 && (
           <div className="flex justify-center gap-2 mt-8">
             <button
               disabled={page <= 1}
-              onClick={() =>
-                router.push(`/colleges?page=${page - 1}${search ? `&search=${search}` : ""}`)
-              }
+              onClick={() => router.push(`/colleges?page=${page - 1}${search ? `&search=${search}` : ""}`)}
               className="px-4 py-2 rounded-lg border text-sm disabled:opacity-40 hover:bg-gray-50"
-            >
-              Previous
-            </button>
+            >Previous</button>
             <span className="px-4 py-2 text-sm text-gray-600">Page {page}</span>
             <button
-              onClick={() =>
-                router.push(`/colleges?page=${page + 1}${search ? `&search=${search}` : ""}`)
-              }
+              onClick={() => router.push(`/colleges?page=${page + 1}${search ? `&search=${search}` : ""}`)}
               className="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50"
-            >
-              Next
-            </button>
+            >Next</button>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+export default function CollegesPage() {
+  return (
+    <Suspense fallback={<div className="p-10 text-gray-400">Loading...</div>}>
+      <CollegesContent />
+    </Suspense>
   );
 }
