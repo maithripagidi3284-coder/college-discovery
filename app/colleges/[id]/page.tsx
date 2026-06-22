@@ -59,7 +59,7 @@ export default async function CollegeDetail({
           <p className="text-gray-400">No courses listed yet.</p>
         ) : (
           <ul className="space-y-2">
-            {college.courses.map((c) => (
+            {college.courses.map((c: { id: string; name: string; duration: string; fees: number }) => (
               <li
                 key={c.id}
                 className="border rounded-lg p-3 flex justify-between"
